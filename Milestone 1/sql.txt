@@ -1,0 +1,156 @@
+CREATE DATABASE `auccatalog` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+
+
+
+CREATE TABLE `auccatalog`.`department` (
+  `Dcode` VARCHAR(15) NOT NULL,
+  `Name` VARCHAR(45) NULL,
+  `Building` VARCHAR(45) NULL,
+  PRIMARY KEY (`Dcode`));
+
+
+
+
+
+
+CREATE TABLE `auccatalog`.`course` (
+  `CCode` VARCHAR(15) NOT NULL,
+  `Name` VARCHAR(45) NULL,
+  `CreditNo` INT NULL,
+  `Description` VARCHAR(45) NULL,
+  `Notes` VARCHAR(45) NULL,
+  `Fk_DeptCode` VARCHAR(15) NULL,
+  PRIMARY KEY (`CCode`),
+  INDEX `Fk_DeptCode_idx` (`Fk_DeptCode` ASC) VISIBLE,
+  CONSTRAINT `Fk_DeptCode`
+    FOREIGN KEY (`Fk_DeptCode`)
+    REFERENCES `auccatalog`.`department` (`Dcode`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+
+
+CREATE TABLE `auccatalog`.`crosscourseslisted` (
+  `Fk_Course1No` VARCHAR(15) NOT NULL,
+  `Fk_Course2No` VARCHAR(15) NOT NULL,
+  PRIMARY KEY (`Fk_Course1No`, `Fk_Course2No`),
+  INDEX `Fk_Course2No_idx` (`Fk_Course2No` ASC) VISIBLE,
+  CONSTRAINT `Fk_Course1No`
+    FOREIGN KEY (`Fk_Course1No`)
+    REFERENCES `auccatalog`.`course` (`CCode`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `Fk_Course2No`
+    FOREIGN KEY (`Fk_Course2No`)
+    REFERENCES `auccatalog`.`course` (`CCode`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+CREATE TABLE `auccatalog`.`courseprereq` (
+  `Fk_CourseNo` VARCHAR(15) NOT NULL,
+  `Fk_ToCourseNo` VARCHAR(15) NOT NULL,
+  `IsConcurret` CHAR NULL,
+  PRIMARY KEY (`Fk_CourseNo`, `Fk_ToCourseNo`),
+  INDEX `Fk_toCourseNo_idx` (`Fk_ToCourseNo` ASC) VISIBLE,
+  CONSTRAINT `Fk_CourseNo`
+    FOREIGN KEY (`Fk_CourseNo`)
+    REFERENCES `auccatalog`.`course` (`CCode`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `Fk_toCourseNo`
+    FOREIGN KEY (`Fk_ToCourseNo`)
+    REFERENCES `auccatalog`.`course` (`CCode`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+
+
+
+
+CREATE TABLE `auccatalog`.`coursesemesteroffered` (
+  `Fks_CourseNo` VARCHAR(15) NOT NULL,
+  `Semester` VARCHAR(15) NOT NULL,
+  PRIMARY KEY (`Fks_CourseNo`, `Semester`),
+  CONSTRAINT `fks_courseno`
+    FOREIGN KEY (`Fks_CourseNo`)
+    REFERENCES `auccatalog`.`course` (`CCode`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+
+
+CREATE TABLE `auccatalog`.`aucstudent` (
+  `ID` VARCHAR(15) NOT NULL,
+  `FName` VARCHAR(45) NULL,
+  `LName` VARCHAR(45) NULL,
+  `ClassStanding` VARCHAR(45) NULL,
+  PRIMARY KEY (`ID`));
+
+
+CREATE TABLE `auccatalog`.`studentdepart` (
+  `Fk_StudentId` VARCHAR(15) NOT NULL,
+  `Fks_DeptCode` VARCHAR(15) NOT NULL,
+  PRIMARY KEY (`Fk_StudentId`, `Fks_DeptCode`),
+  INDEX `fks_deptcode_idx` (`Fks_DeptCode` ASC) VISIBLE,
+  CONSTRAINT `fk_studentid`
+    FOREIGN KEY (`Fk_StudentId`)
+    REFERENCES `auccatalog`.`aucstudent` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fks_deptcode`
+    FOREIGN KEY (`Fks_DeptCode`)
+    REFERENCES `auccatalog`.`department` (`Dcode`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+
+CREATE TABLE `auccatalog`.`studentcoursescompleted` (
+  `Fkc_studentID` VARCHAR(15) NOT NULL,
+  `Fkc_CourseNo` VARCHAR(15) NOT NULL,
+  `Grade` VARCHAR(2) NULL,
+  `Semester` VARCHAR(15) NULL,
+  `YEAR` INT NULL,
+  PRIMARY KEY (`Fkc_studentID`, `Fkc_CourseNo`),
+  INDEX `fkc_courseno_idx` (`Fkc_CourseNo` ASC) VISIBLE,
+  CONSTRAINT `fkc_studentid`
+    FOREIGN KEY (`Fkc_studentID`)
+    REFERENCES `auccatalog`.`aucstudent` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fkc_courseno`
+    FOREIGN KEY (`Fkc_CourseNo`)
+    REFERENCES `auccatalog`.`course` (`CCode`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+
+
+
+CREATE TABLE `auccatalog`.`studentreviewcourse` (
+  `Fkr_studentId` VARCHAR(15) NOT NULL,
+  `Fkr_courseno` VARCHAR(15) NOT NULL,
+  `Rating` INT NULL,
+  `TextualReview` VARCHAR(45) NULL,
+  PRIMARY KEY (`Fkr_studentId`, `Fkr_courseno`),
+  INDEX `fkr_courseno_idx` (`Fkr_courseno` ASC) VISIBLE,
+  CONSTRAINT `fkr_studentid`
+    FOREIGN KEY (`Fkr_studentId`)
+    REFERENCES `auccatalog`.`aucstudent` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fkr_courseno`
+    FOREIGN KEY (`Fkr_courseno`)
+    REFERENCES `auccatalog`.`course` (`CCode`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+
+
